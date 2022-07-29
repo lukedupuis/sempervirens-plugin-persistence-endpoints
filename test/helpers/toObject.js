@@ -1,0 +1,1 @@
+export default record => JSON.parse(JSON.stringify(record));

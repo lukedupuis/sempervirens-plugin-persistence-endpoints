@@ -1,0 +1,49 @@
+{
+  "name": "@sempervirens/plugin-persistence-endpoints",
+  "version": "0.0.1",
+  "description": "A set of endpoints to facilitate create, read, update, and delete operations via Express on MongoDB",
+  "main": "index.js",
+  "type": "module",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "cd test && mocha persistenceEndpoints.test.js --timeout=5000 && mocha create-request-handler.test.js && mocha delete-request-handler.test.js && mocha find-request-handler.test.js --timeout=5000 && mocha update-request-handler.test.js && mocha populate.test.js",
+    "test:persistence": "cd test && mocha persistenceEndpoints.test.js --timeout=5000",
+    "test:create": "cd test && mocha create-request-handler.test.js --timeout=5000",
+    "test:delete": "cd test && mocha delete-request-handler.test.js",
+    "test:find": "cd test && mocha find-request-handler.test.js --timeout=5000",
+    "test:update": "cd test && mocha update-request-handler.test.js",
+    "test:populate": "cd test && mocha populate.test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lukedupuis/sempervirens-plugin-persistence-endpoints.git"
+  },
+  "keywords": [
+    "Express",
+    "plugins",
+    "endpoints",
+    "Create-Read-Update-Delete",
+    "MongoDB"
+  ],
+  "author": "Luke Dupuis",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/lukedupuis/sempervirens-plugin-persistence-endpoints/issues"
+  },
+  "homepage": "https://github.com/lukedupuis/sempervirens-plugin-persistence-endpoints#readme",
+  "devDependencies": {
+    "@sempervirens/authorizer": "^0.5.0",
+    "@sempervirens/server": "^0.0.6",
+    "chai": "^4.3.6",
+    "mocha": "^10.0.0",
+    "mongoose": "^6.4.6",
+    "superagent": "^8.0.0"
+  },
+  "dependencies": {
+    "@sempervirens/dao": "^0.2.2",
+    "@sempervirens/endpoint": "^0.8.3",
+    "lodash.kebabcase": "^4.1.1"
+  }
+}
