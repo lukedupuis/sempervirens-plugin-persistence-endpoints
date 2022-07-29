@@ -22,24 +22,24 @@ In the [Code Example](#code-example) below are some examples of basic usage. Aft
 
 ### Endpoints
 
-Create records with the request body.
+_Create_ records with the request body.
 
-`POST http://localhost[:{port}]/{domain}/{api|apiBaseUrl}/{kebab-case-model-name|modelBaseUrl}/create`
+`POST http://localhost[:{port}]/{domain}/{api|apiBaseUrl}/{kebab-case-model-name|modelBaseUrl}/create`<br><br>
 `POST http://{domain}/{api|apiBaseUrl}/{kebab-case-model-name|modelBaseUrl}/create`
 
-Delete records with the given ID(s).
+_Delete_ records with the given ID(s).
 
-`DELETE http://localhost[:{port}]/{domain}/{api|apiBaseUrl}/{kebab-case-model-name|modelBaseUrl}/delete/{id1,id2}`
+`DELETE http://localhost[:{port}]/{domain}/{api|apiBaseUrl}/{kebab-case-model-name|modelBaseUrl}/delete/{id1,id2}`<br><br>
 `DELETE http://{domain}/{api|apiBaseUrl}/{kebab-case-model-name|modelBaseUrl}/delete/{id1,id2}`
 
-Find the records matching the given criteria.
+_Find_ the records matching the given criteria.
 
-`GET http://localhost[:{port}]/{domain}/{api|apiBaseUrl}/{kebab-case-model-name|modelBaseUrl}/find[/{ids}[?filters=[&sort=[&page=[&perPage=[&select=[&populate]]]]]]]]`
+`GET http://localhost[:{port}]/{domain}/{api|apiBaseUrl}/{kebab-case-model-name|modelBaseUrl}/find[/{ids}[?filters=[&sort=[&page=[&perPage=[&select=[&populate]]]]]]]]`<br><br>
 `GET http://{domain}/{api|apiBaseUrl}/{kebab-case-model-name|modelBaseUrl}/find[/{ids}[?filters=[&sort=[&page=[&perPage=[&select=[&populate]]]]]]]]`
 
-Update the records matching given critiera using the request body.
+_Update_ the records matching given critiera using the request body.
 
-`PATCH http://localhost[:{port}]/{domain}/{api|apiBaseUrl}/{kebab-case-model-name|modelBaseUrl}/update[/{ids}[?filters=[&sort=[&populate]]]]]]]`
+`PATCH http://localhost[:{port}]/{domain}/{api|apiBaseUrl}/{kebab-case-model-name|modelBaseUrl}/update[/{ids}[?filters=[&sort=[&populate]]]]]]]`<br><br>
 `PATCH http://{domain}/{api|apiBaseUrl}/{kebab-case-model-name|modelBaseUrl}/update[/{ids}[?filters=[&sort=[&populate]]]]]]]`
 
 ### Code Example
