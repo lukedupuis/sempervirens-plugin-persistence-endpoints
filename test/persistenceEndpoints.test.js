@@ -66,11 +66,16 @@ startServer(
     {
       modelName: 'Test1',
       modelBasePath: 'test-1c',
+      isSecure: true
+    },
+    {
+      modelName: 'Test1',
+      modelBasePath: 'test-1d',
       create: { isSecure: true },
       delete: { isSecure: true },
       find: { isSecure: true },
       update: { isSecure: true }
-    }
+    },
   ])
 );
 
@@ -904,114 +909,240 @@ describe('1. persistenceEndpoints', () => {
 
   describe('1.6. When "isSecure" is given', () => {
 
-    describe('1.6.1. When "create" is called', () => {
-      it('1.6.1.1. Should allow requests only if the token is valid', async () => {
-        const token = authorizer.encrypt({ expiresIn: '1m', data: { prop1: 'val1' } });
-        const { body: { data: { record } } } = await superagent
-          .post('http://localhost:8080/site-1/api/test-1a/create')
-          .set('Authorization', `Bearer ${token}`)
-          .send({ prop1a: 'val1a' });
-        expect(record.prop1a).to.equal('val1a');
+    describe('1.6.1. When given for all endpoints', () => {
 
-        authorizer.invalidate(token);
-
-        try {
-          await superagent
-            .post('http://localhost:8080/site-1/api/test-1a/create')
+      describe('1.6.1.1. When "create" is called', () => {
+        it('1.6.1.1.1. Should allow requests only if the token is valid', async () => {
+          const token = authorizer.encrypt({ expiresIn: '1m', data: { prop1: 'val1' } });
+          const { body: { data: { record } } } = await superagent
+            .post('http://localhost:8080/site-1/api/test-1c/create')
             .set('Authorization', `Bearer ${token}`)
             .send({ prop1a: 'val1a' });
-        } catch({ message }) {
-          expect(message).to.equal('Unauthorized');
-        }
+          expect(record.prop1a).to.equal('val1a');
 
-        await Test1.deleteMany();
+          authorizer.invalidate(token);
+
+          try {
+            await superagent
+              .post('http://localhost:8080/site-1/api/test-1c/create')
+              .set('Authorization', `Bearer ${token}`)
+              .send({ prop1a: 'val1a' });
+            expect(true).to.be.false;
+          } catch({ message }) {
+            expect(message).to.equal('Unauthorized');
+          }
+
+          await Test1.deleteMany();
+        });
       });
-    });
 
-    describe('1.6.2. When "delete" is called', () => {
-      it('1.6.2.1. Should allow requests only if the token is valid', async () => {
-        const record1 = await Test1.create({ prop1a: 'val1ai' });
-        const id1 = record1._id.toString();
-        const token = authorizer.encrypt({ expiresIn: '1m', data: { prop1: 'val1ai' } });
-        const { body: { data: { deletedCount } } } = await superagent
-          .delete(`http://localhost:8080/site-1/api/test-1c/delete/${id1}`)
-          .set('Authorization', `Bearer ${token}`);
-        expect(deletedCount).to.equal(1);
-
-        authorizer.invalidate(token);
-
-        const record2a = await Test1.create({ prop1a: 'val1aii' });
-        const id2 = record2a._id.toString();
-        try {
-          await superagent
-            .delete(`http://localhost:8080/site-1/api/test-1c/delete/${id2}`)
+      describe('1.6.1.2. When "delete" is called', () => {
+        it('1.6.2.1.1. Should allow requests only if the token is valid', async () => {
+          const record1 = await Test1.create({ prop1a: 'val1ai' });
+          const id1 = record1._id.toString();
+          const token = authorizer.encrypt({ expiresIn: '1m', data: { prop1: 'val1ai' } });
+          const { body: { data: { deletedCount } } } = await superagent
+            .delete(`http://localhost:8080/site-1/api/test-1c/delete/${id1}`)
             .set('Authorization', `Bearer ${token}`);
-        } catch({ message }) {
-          const record2b = await Test1.findOne({ _id: id2 });
-          expect(record2b).to.exist;
-          expect(message).to.equal('Unauthorized');
-        }
+          expect(deletedCount).to.equal(1);
 
-        await Test1.deleteMany();
+          authorizer.invalidate(token);
+
+          const record2a = await Test1.create({ prop1a: 'val1aii' });
+          const id2 = record2a._id.toString();
+          try {
+            await superagent
+              .delete(`http://localhost:8080/site-1/api/test-1c/delete/${id2}`)
+              .set('Authorization', `Bearer ${token}`);
+            expect(true).to.be.false;
+          } catch({ message }) {
+            const record2b = await Test1.findOne({ _id: id2 });
+            expect(record2b).to.exist;
+            expect(message).to.equal('Unauthorized');
+          }
+
+          await Test1.deleteMany();
+        });
       });
-    });
 
-    describe('1.6.3. When "find" is called', () => {
-      it('1.6.3.1. Should allow requests only if the token is valid', async () => {
-        const record1 = await Test1.create({ prop1a: 'val1a' });
-        const id1 = record1._id.toString();
-        const token = authorizer.encrypt({ expiresIn: '1s', data: { prop1: 'val1' } });
-        const { body: { data: { record } } } = await superagent
-          .get(`http://localhost:8080/site-1/api/test-1c/find/${id1}`)
-          .set('Authorization', `Bearer ${token}`);
-        expect(record.prop1a).to.equal('val1a');
-
-        authorizer.invalidate(token);
-
-        const record2 = await Test1.create({ prop1a: 'val1a' });
-        const id2 = record2._id.toString();
-        try {
-          await superagent
-            .get(`http://localhost:8080/site-1/api/test-1c/find/${id2}`)
+      describe('1.6.1.3. When "find" is called', () => {
+        it('1.6.1.3.1. Should allow requests only if the token is valid', async () => {
+          const record1 = await Test1.create({ prop1a: 'val1a' });
+          const id1 = record1._id.toString();
+          const token = authorizer.encrypt({ expiresIn: '1s', data: { prop1: 'val1' } });
+          const { body: { data: { record } } } = await superagent
+            .get(`http://localhost:8080/site-1/api/test-1c/find/${id1}`)
             .set('Authorization', `Bearer ${token}`);
-        } catch({ message }) {
-          expect(message).to.equal('Unauthorized');
-        }
+          expect(record.prop1a).to.equal('val1a');
 
-        await Test1.deleteMany();
+          authorizer.invalidate(token);
+
+          const record2 = await Test1.create({ prop1a: 'val1a' });
+          const id2 = record2._id.toString();
+          try {
+            await superagent
+              .get(`http://localhost:8080/site-1/api/test-1c/find/${id2}`)
+              .set('Authorization', `Bearer ${token}`);
+            expect(true).to.be.false;
+          } catch({ message }) {
+            expect(message).to.equal('Unauthorized');
+          }
+
+          await Test1.deleteMany();
+        });
       });
-    });
 
-    describe('1.6.4. When "update" is called', () => {
-      it('1.6.4.1. Should allow requests only if the token is valid', async () => {
-        const record1 = await Test1.create({ prop1a: 'val1ai' });
-        const id1 = record1._id.toString();
-        const token = authorizer.encrypt({ expiresIn: '1s', data: { prop1: 'val1' } });
-        const { body: { data: { record } } } = await superagent
-          .patch(`http://localhost:8080/site-1/api/test-1c/update/${id1}`)
-          .set('Authorization', `Bearer ${token}`)
-          .send({ prop1a: 'val1aii' });
-        expect(record.prop1a).to.equal('val1aii');
-
-        authorizer.invalidate(token);
-
-        const record2a = await Test1.create({ prop1a: 'val1aiii' });
-        const id2 = record2a._id.toString();
-        try {
-          await superagent
-            .patch(`http://localhost:8080/site-1/api/test-1c/update/${id2}`)
+      describe('1.6.1.4. When "update" is called', () => {
+        it('1.6.1.4.1. Should allow requests only if the token is valid', async () => {
+          const record1 = await Test1.create({ prop1a: 'val1ai' });
+          const id1 = record1._id.toString();
+          const token = authorizer.encrypt({ expiresIn: '1s', data: { prop1: 'val1' } });
+          const { body: { data: { record } } } = await superagent
+            .patch(`http://localhost:8080/site-1/api/test-1c/update/${id1}`)
             .set('Authorization', `Bearer ${token}`)
-            .send({ prop1a: 'val1iv' });
-        } catch({ message }) {
-          const record2b = await Test1.findOne({ prop1a: 'val1aiii' });
-          const record2c = await Test1.findOne({ prop1a: 'val1aiv' });
-          expect(record2b).to.exist;
-          expect(record2c).not.to.exist;
-          expect(message).to.equal('Unauthorized');
-        }
+            .send({ prop1a: 'val1aii' });
+          expect(record.prop1a).to.equal('val1aii');
 
-        await Test1.deleteMany();
+          authorizer.invalidate(token);
+
+          const record2a = await Test1.create({ prop1a: 'val1aiii' });
+          const id2 = record2a._id.toString();
+          try {
+            await superagent
+              .patch(`http://localhost:8080/site-1/api/test-1c/update/${id2}`)
+              .set('Authorization', `Bearer ${token}`)
+              .send({ prop1a: 'val1iv' });
+            expect(true).to.be.false;
+          } catch({ message }) {
+            const record2b = await Test1.findOne({ prop1a: 'val1aiii' });
+            const record2c = await Test1.findOne({ prop1a: 'val1aiv' });
+            expect(record2b).to.exist;
+            expect(record2c).not.to.exist;
+            expect(message).to.equal('Unauthorized');
+          }
+
+          await Test1.deleteMany();
+        });
       });
+
+    });
+
+    describe('1.6.2. When given on the individual endpoint level', () => {
+
+      describe('1.6.2.1. When "create" is called', () => {
+        it('1.6.2.1.1. Should allow requests only if the token is valid', async () => {
+          const token = authorizer.encrypt({ expiresIn: '1m', data: { prop1: 'val1' } });
+          const { body: { data: { record } } } = await superagent
+            .post('http://localhost:8080/site-1/api/test-1d/create')
+            .set('Authorization', `Bearer ${token}`)
+            .send({ prop1a: 'val1a' });
+          expect(record.prop1a).to.equal('val1a');
+
+          authorizer.invalidate(token);
+
+          try {
+            await superagent
+              .post('http://localhost:8080/site-1/api/test-1d/create')
+              .set('Authorization', `Bearer ${token}`)
+              .send({ prop1a: 'val1a' });
+            expect(true).to.be.false;
+          } catch({ message }) {
+            expect(message).to.equal('Unauthorized');
+          }
+
+          await Test1.deleteMany();
+        });
+      });
+
+      describe('1.6.2.2. When "delete" is called', () => {
+        it('1.6.2.2.1. Should allow requests only if the token is valid', async () => {
+          const record1 = await Test1.create({ prop1a: 'val1ai' });
+          const id1 = record1._id.toString();
+          const token = authorizer.encrypt({ expiresIn: '1m', data: { prop1: 'val1ai' } });
+          const { body: { data: { deletedCount } } } = await superagent
+            .delete(`http://localhost:8080/site-1/api/test-1d/delete/${id1}`)
+            .set('Authorization', `Bearer ${token}`);
+          expect(deletedCount).to.equal(1);
+
+          authorizer.invalidate(token);
+
+          const record2a = await Test1.create({ prop1a: 'val1aii' });
+          const id2 = record2a._id.toString();
+          try {
+            await superagent
+              .delete(`http://localhost:8080/site-1/api/test-1d/delete/${id2}`)
+              .set('Authorization', `Bearer ${token}`);
+            expect(true).to.be.false;
+          } catch({ message }) {
+            const record2b = await Test1.findOne({ _id: id2 });
+            expect(record2b).to.exist;
+            expect(message).to.equal('Unauthorized');
+          }
+
+          await Test1.deleteMany();
+        });
+      });
+
+      describe('1.6.2.3. When "find" is called', () => {
+        it('1.6.2.3.1. Should allow requests only if the token is valid', async () => {
+          const record1 = await Test1.create({ prop1a: 'val1a' });
+          const id1 = record1._id.toString();
+          const token = authorizer.encrypt({ expiresIn: '1s', data: { prop1: 'val1' } });
+          const { body: { data: { record } } } = await superagent
+            .get(`http://localhost:8080/site-1/api/test-1d/find/${id1}`)
+            .set('Authorization', `Bearer ${token}`);
+          expect(record.prop1a).to.equal('val1a');
+
+          authorizer.invalidate(token);
+
+          const record2 = await Test1.create({ prop1a: 'val1a' });
+          const id2 = record2._id.toString();
+          try {
+            await superagent
+              .get(`http://localhost:8080/site-1/api/test-1d/find/${id2}`)
+              .set('Authorization', `Bearer ${token}`);
+            expect(true).to.be.false;
+          } catch({ message }) {
+            expect(message).to.equal('Unauthorized');
+          }
+
+          await Test1.deleteMany();
+        });
+      });
+
+      describe('1.6.2.4. When "update" is called', () => {
+        it('1.6.2.4.1. Should allow requests only if the token is valid', async () => {
+          const record1 = await Test1.create({ prop1a: 'val1ai' });
+          const id1 = record1._id.toString();
+          const token = authorizer.encrypt({ expiresIn: '1s', data: { prop1: 'val1' } });
+          const { body: { data: { record } } } = await superagent
+            .patch(`http://localhost:8080/site-1/api/test-1d/update/${id1}`)
+            .set('Authorization', `Bearer ${token}`)
+            .send({ prop1a: 'val1aii' });
+          expect(record.prop1a).to.equal('val1aii');
+
+          authorizer.invalidate(token);
+
+          const record2a = await Test1.create({ prop1a: 'val1aiii' });
+          const id2 = record2a._id.toString();
+          try {
+            await superagent
+              .patch(`http://localhost:8080/site-1/api/test-1d/update/${id2}`)
+              .set('Authorization', `Bearer ${token}`)
+              .send({ prop1a: 'val1iv' });
+            expect(true).to.be.false;
+          } catch({ message }) {
+            const record2b = await Test1.findOne({ prop1a: 'val1aiii' });
+            const record2c = await Test1.findOne({ prop1a: 'val1aiv' });
+            expect(record2b).to.exist;
+            expect(record2c).not.to.exist;
+            expect(message).to.equal('Unauthorized');
+          }
+
+          await Test1.deleteMany();
+        });
+      });
+
     });
 
   });

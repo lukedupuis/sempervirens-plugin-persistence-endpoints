@@ -9,6 +9,7 @@ const persistenceEndpoints = data => {
     modelName = '',
     modelBasePath = '',
     apiBasePath = '/api',
+    isSecure,
 
     create = {
       max: null,
@@ -40,6 +41,13 @@ const persistenceEndpoints = data => {
     const deleteData = { modelName, ..._delete };
     const findData = { modelName, ...find };
     const updateData = { modelName, ...update };
+
+    if (isSecure) {
+      create.isSecure = true;
+      _delete.isSecure = true;
+      find.isSecure = true;
+      update.isSecure = true;
+    }
 
     endpoints.push(
       {
