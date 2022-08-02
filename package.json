@@ -1,6 +1,6 @@
 {
   "name": "@sempervirens/plugin-persistence-endpoints",
-  "version": "0.0.2",
+  "version": "0.1.0",
   "description": "A set of endpoints to facilitate create, read, update, and delete operations via Express on MongoDB",
   "main": "index.js",
   "type": "module",
