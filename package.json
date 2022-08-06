@@ -33,17 +33,17 @@
     "url": "https://github.com/lukedupuis/sempervirens-plugin-persistence-endpoints/issues"
   },
   "homepage": "https://github.com/lukedupuis/sempervirens-plugin-persistence-endpoints#readme",
+  "dependencies": {
+    "@sempervirens/dao": "^0.2.2",
+    "@sempervirens/endpoint": "^0.9.0",
+    "lodash.kebabcase": "^4.1.1"
+  },
   "devDependencies": {
     "@sempervirens/authorizer": "^0.5.0",
-    "@sempervirens/server": "^0.0.6",
+    "@sempervirens/server": "^0.2.0",
     "chai": "^4.3.6",
     "mocha": "^10.0.0",
     "mongoose": "^6.4.6",
     "superagent": "^8.0.0"
-  },
-  "dependencies": {
-    "@sempervirens/dao": "^0.2.2",
-    "@sempervirens/endpoint": "^0.8.3",
-    "lodash.kebabcase": "^4.1.1"
   }
 }

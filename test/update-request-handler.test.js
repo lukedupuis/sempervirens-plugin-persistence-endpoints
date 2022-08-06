@@ -37,26 +37,22 @@ const Test1 = db.getModel('Test1');
 const Test2 = db.getModel('Test2');
 
 describe('1. UpdateRequestHandler', () => {
-  // return;
 
   describe('1.1. When "PATCH /api/update[/{ids}[?filters=[&sort=[&populate]]]]]]] is called', () => {
-    // return;
 
     describe('1.1.1. When "PATCH /api/update[/{ids}[?filters=]]" is called without a "body"', () => {
-      // return;
       it('1.1.1.1. Should return an error', async () => {
         const { body: { error: { message } } } = await superagent
-          .patch('http://localhost:8080/site-1/api/test-1/update')
+          .patch('http://localhost:8080/api/test-1/update')
           .send();
         expect(message).to.equal('"body" is required.');
       });
     });
 
     describe('1.1.2. When "PATCH /api/update/{ids}?filters=" is called', () => {
-      // return;
       it('1.1.2.1. Should return an error', async () => {
         const { body: { error: { message } } } = await superagent
-          .patch(`http://localhost:8080/site-1/api/test-1/update/1234?filters={"prop1a":"val1a"}`)
+          .patch(`http://localhost:8080/api/test-1/update/1234?filters={"prop1a":"val1a"}`)
           .send({ prop1a: 'val1a' });
         expect(message).to.equal([
           '"ids" or "filters" may be used, not both. If more refined ',
@@ -67,10 +63,9 @@ describe('1. UpdateRequestHandler', () => {
     });
 
     describe('1.1.3. When "PATCH /api/update/{ids}" is called with a "body" array', () => {
-      // return;
       it('1.1.3.1. Should return an error', async () => {
         const { body: { error: { message } } } = await superagent
-          .patch(`http://localhost:8080/site-1/api/test-1/update/1234,5678`)
+          .patch(`http://localhost:8080/api/test-1/update/1234,5678`)
           .send([{ prop1a: 'val1a' }]);
         expect(message).to.equal([
           'To update multiple records separately, omit "ids" and "filters" ',
@@ -81,10 +76,9 @@ describe('1. UpdateRequestHandler', () => {
     });
 
     describe('1.1.4. When "PATCH /api/update?filters=" is called with a "body" array', () => {
-      // return;
       it('1.1.4.1. Should return an error', async () => {
         const { body: { error: { message } } } = await superagent
-          .patch(`http://localhost:8080/site-1/api/test-1/update?filters={"prop1a":"val1a"}`)
+          .patch(`http://localhost:8080/api/test-1/update?filters={"prop1a":"val1a"}`)
           .send([{ prop1a: 'val1a' }]);
         expect(message).to.equal([
           'To update multiple records separately, omit "ids" and "filters" ',
@@ -95,10 +89,9 @@ describe('1. UpdateRequestHandler', () => {
     });
 
     describe('1.1.5. When "PATCH /api/update" is called with a "body" array and an object is missing "id" and "_id"', () => {
-      // return;
       it('1.1.5.1. Should throw an error', async () => {
         const { body: { error: { message } } } = await superagent
-          .patch(`http://localhost:8080/site-1/api/test-1/update`)
+          .patch(`http://localhost:8080/api/test-1/update`)
           .send([{ prop1a: 'val1a' }]);
         expect(message).to.equal([
           'If "body" is an array, then "_id" or "id" must be exist ',
@@ -108,10 +101,9 @@ describe('1. UpdateRequestHandler', () => {
     });
 
     describe('1.1.6. When "Patch /api/update" is called with "body" as an object literal and is missing "id" and "_id"', () => {
-      // return;
       it('1.1.6.1. Should throw an error', async () => {
         const { body: { error: { message } } } = await superagent
-          .patch(`http://localhost:8080/site-1/api/test-1/update`)
+          .patch(`http://localhost:8080/api/test-1/update`)
           .send({ prop1a: 'val1a' });
         expect(message).to.equal([
           'If "ids" and "filters" are not given, then "_id" or "id" must ',
@@ -121,10 +113,8 @@ describe('1. UpdateRequestHandler', () => {
     });
 
     describe('1.1.7. When the given number of records to update exceeds the data "max"', () => {
-      // return;
 
       describe('1.1.7.1 When "ids" is given', () => {
-        // return;
         it('1.1.7.1.1. Should return an error', async () => {
           const ids = [];
           for (let i = 0; i < 11; i++) {
@@ -132,7 +122,7 @@ describe('1. UpdateRequestHandler', () => {
             ids.push(record._id.toString());
           }
           const { body: { error: { message } } } = await superagent
-            .patch(`http://localhost:8080/site-1/api/test-1/update/${ids.join()}`)
+            .patch(`http://localhost:8080/api/test-1/update/${ids.join()}`)
             .send({ prop1a: 'val1aii' });
           expect(message).to.equal('The maximum number of records allowed in one request is 10.');
           await Test1.deleteMany();
@@ -140,14 +130,13 @@ describe('1. UpdateRequestHandler', () => {
       });
 
       describe('1.1.7.2 When "filters" is given', () => {
-        // return;
         it('1.1.7.2.1. Should return an error that suggests narrowing filters', async () => {
           for (let i = 0; i < 11; i++) {
             await Test1.create({ prop1a: 'val1ai' });
           }
           const filters = JSON.stringify({ prop1a: 'val1ai' });
           const { body: { error: { message } } } = await superagent
-            .patch(`http://localhost:8080/site-1/api/test-1/update?filters=${filters}`)
+            .patch(`http://localhost:8080/api/test-1/update?filters=${filters}`)
             .send({ prop1a: 'val1aii' });
           expect(message).to.equal('The maximum number of records allowed in one request is 10.');
           await Test1.deleteMany();
@@ -155,7 +144,6 @@ describe('1. UpdateRequestHandler', () => {
       });
 
       describe('1.1.7.3 When a body array is given', () => {
-        // return;
         it('1.1.7.3.1. Should return an error', async () => {
           const toUpdate = [];
           for (let i = 0; i < 11; i++) {
@@ -166,7 +154,7 @@ describe('1. UpdateRequestHandler', () => {
             });
           }
           const { body: { error: { message } } } = await superagent
-            .patch(`http://localhost:8080/site-1/api/test-1/update`)
+            .patch(`http://localhost:8080/api/test-1/update`)
             .send(toUpdate);
           expect(message).to.equal('The maximum number of records allowed in one request is 10.');
           await Test1.deleteMany();
@@ -176,12 +164,11 @@ describe('1. UpdateRequestHandler', () => {
     });
 
     describe('1.1.8. When one or more records is updated', () => {
-      // return;
       it('1.1.8.1. Should call the model pre-save hook', async () => {
         const record1 = await Test1.create({ prop1a: 'val1a', prop1b: 'val1b' });
         const ids1 = record1._id.toString();
         const { body: { data: { record: record2 } } } = await superagent
-          .patch(`http://localhost:8080/site-1/api/test-1/update/${ids1}`)
+          .patch(`http://localhost:8080/api/test-1/update/${ids1}`)
           .send({ prop1a: 'val1c', prop1b: 'val1d' });
         expect(record2.prop1c).to.equal('val1c-val1d');
         await Test1.deleteMany();
@@ -192,7 +179,7 @@ describe('1. UpdateRequestHandler', () => {
           ids2.push(record._id.toString());
         }
         const { body: { data: { records } } } = await superagent
-          .patch(`http://localhost:8080/site-1/api/test-1/update/${ids2}`)
+          .patch(`http://localhost:8080/api/test-1/update/${ids2}`)
           .send({ prop1a: 'val1c', prop1b: 'val1d' });
         records.forEach(record => {
           expect(record.prop1c).to.equal('val1c-val1d');
@@ -204,14 +191,12 @@ describe('1. UpdateRequestHandler', () => {
   });
 
   describe('1.2. When "PATCH /api/update" is called', () => {
-    // return;
 
     describe('1.2.1. When "body" is an object literal with "_id" or "id"', () => {
-      // return;
       it('1.2.1.1. Should update the record', async () => {
         const record1 = await Test1.create({ prop1a: 'val1ai' });
         const { body: { data: { record: record2 } } } = await superagent
-          .patch('http://localhost:8080/site-1/api/test-1/update')
+          .patch('http://localhost:8080/api/test-1/update')
           .send({
             _id: record1._id.toString(),
             prop1a: 'val1aii'
@@ -222,7 +207,6 @@ describe('1. UpdateRequestHandler', () => {
     });
 
     describe('1.2.2. When "body" is an array of objects with "_id" or "id"', () => {
-      // return;
       it('1.2.2.1. Should update the record', async () => {
         const toUpdate = [];
         for (let i = 0; i < 3; i++) {
@@ -233,7 +217,7 @@ describe('1. UpdateRequestHandler', () => {
           });
         }
         const { body: { data: { records } } } = await superagent
-          .patch('http://localhost:8080/site-1/api/test-1/update')
+          .patch('http://localhost:8080/api/test-1/update')
           .send(toUpdate);
         records.forEach(record => {
           expect(record.prop1a).to.equal('val1aii');
@@ -245,15 +229,13 @@ describe('1. UpdateRequestHandler', () => {
   });
 
   describe('1.3. When "PATCH /api/update/{ids}" is called', () => {
-    // return;
 
     describe('1.3.1. When one ID is given with body as one object literal', () => {
-      // return;
       it('1.3.1.1. Should update the record', async () => {
         const record1 = await Test1.create({ prop1a: 'val1ai' });
         const ids = record1._id.toString();
         const { body: { data: { record: record2 } } } = await superagent
-          .patch(`http://localhost:8080/site-1/api/test-1/update/${ids}`)
+          .patch(`http://localhost:8080/api/test-1/update/${ids}`)
           .send({ prop1a: 'val1aii' });
         expect(record2.prop1a).to.equal('val1aii');
         await Test1.deleteMany();
@@ -261,7 +243,6 @@ describe('1. UpdateRequestHandler', () => {
     });
 
     describe('1.3.2. When multiple IDs are given with body as one object literal', () => {
-      // return;
       it('1.3.2.1. Should update all the records with the same values', async () => {
         const ids = [];
         for (let i = 0; i < 3; i++) {
@@ -269,7 +250,7 @@ describe('1. UpdateRequestHandler', () => {
           ids.push(record._id.toString());
         }
         const { body: { data: { records } } } = await superagent
-          .patch(`http://localhost:8080/site-1/api/test-1/update/${ids.join()}`)
+          .patch(`http://localhost:8080/api/test-1/update/${ids.join()}`)
           .send({ prop1a: 'val1aii' });
         records.forEach(record => {
           expect(record.prop1a).to.equal('val1aii');
@@ -281,15 +262,13 @@ describe('1. UpdateRequestHandler', () => {
   });
 
   describe('1.4. When "PATCH /api/update?filters=" is called', () => {
-    // return;
 
     describe('1.4.1. When one filter matches', () => {
-      // return;
       it('1.4.1.1. Should update the one record', async () => {
         await Test1.create({ prop1a: 'val1ai' });
         const filters = JSON.stringify({ prop1a: 'val1ai' });
         const { body: { data: { records } } } = await superagent
-          .patch(`http://localhost:8080/site-1/api/test-1/update?filters=${filters}`)
+          .patch(`http://localhost:8080/api/test-1/update?filters=${filters}`)
           .send({ prop1a: 'val1aii' });
         expect(records.length).to.equal(1);
         expect(records[0].prop1a).to.equal('val1aii');
@@ -298,14 +277,13 @@ describe('1. UpdateRequestHandler', () => {
     });
 
     describe('1.4.2. When multiple filters match', () => {
-      // return;
       it('1.4.2.1. Should update all the records with the same values', async () => {
         for (let i = 0; i < 3; i++) {
           await Test1.create({ prop1a: 'val1ai' });
         }
         const filters = JSON.stringify({ prop1a: 'val1ai' });
         const { body: { data: { records } } } = await superagent
-          .patch(`http://localhost:8080/site-1/api/test-1/update?filters=${filters}`)
+          .patch(`http://localhost:8080/api/test-1/update?filters=${filters}`)
           .send({ prop1a: 'val1aii' });
         expect(records.length).to.equal(3);
         records.forEach(record => {
@@ -318,10 +296,8 @@ describe('1. UpdateRequestHandler', () => {
   });
 
   describe('1.5. When "PATCH /api/update?sort=" is called', () => {
-    // return;
 
     describe('1.5.1. When "ids" is given', () => {
-      // return;
       it('1.5.1.1. Should sort the results', async () => {
         const ids = [];
         const records1 = [];
@@ -334,7 +310,7 @@ describe('1. UpdateRequestHandler', () => {
           records1.push(toObject(record));
         }
         const { body: { data: { records: records2 } } } = await superagent
-          .patch(`http://localhost:8080/site-1/api/test-1/update/${ids.join()}?sort=prop1b`)
+          .patch(`http://localhost:8080/api/test-1/update/${ids.join()}?sort=prop1b`)
           .send({ prop1a: 'val1aii' });
         const sortedIds1 = records1
           .sort((a, b) => sortByProperty(a, b, 'prop1b'))
@@ -350,7 +326,6 @@ describe('1. UpdateRequestHandler', () => {
     });
 
     describe('1.5.2. When "filters" is given', () => {
-      // return;
       it('1.5.2.1. Should sort the results', async () => {
         const ids = [];
         const records1 = [];
@@ -364,7 +339,7 @@ describe('1. UpdateRequestHandler', () => {
         }
         const filters = JSON.stringify({ prop1a: 'val1ai' });
         const { body: { data: { records: records2 } } } = await superagent
-          .patch(`http://localhost:8080/site-1/api/test-1/update?filters=${filters}&sort=prop1b`)
+          .patch(`http://localhost:8080/api/test-1/update?filters=${filters}&sort=prop1b`)
           .send({ prop1a: 'val1aii' });
         const sortedIds1 = records1
           .sort((a, b) => sortByProperty(a, b, 'prop1b'))
@@ -380,7 +355,6 @@ describe('1. UpdateRequestHandler', () => {
     });
 
     describe('1.5.3. When "_id" is given in an array of body objects', () => {
-      // return;
       it('1.5.3.1. Should sort the results', async () => {
         const ids = [];
         const records1 = [];
@@ -396,7 +370,7 @@ describe('1. UpdateRequestHandler', () => {
           return { ...record, prop1a: 'val1aii' };
         });
         const { body: { data: { records: records2 } } } = await superagent
-          .patch(`http://localhost:8080/site-1/api/test-1/update?sort=prop1b`)
+          .patch(`http://localhost:8080/api/test-1/update?sort=prop1b`)
           .send(toUpdate);
         const sortedIds1 = records1
           .sort((a, b) => sortByProperty(a, b, 'prop1b'))
@@ -414,10 +388,8 @@ describe('1. UpdateRequestHandler', () => {
   });
 
   describe('1.6. When "PATCH /api/update?populate=" is called', () => {
-    // return;
 
     describe('1.6.1. When "ids" is given', () => {
-      // return;
       it('1.6.1.1. Should populate the given path', async () => {
         const test1 = await Test1.create({ prop1a: 'val1a' });
         const ids = [];
@@ -426,7 +398,7 @@ describe('1. UpdateRequestHandler', () => {
           ids.push(record._id.toString());
         }
         const { body: { data: { records: records1 } } } = await superagent
-          .patch(`http://localhost:8080/site-1/api/test-2/update/${ids.join()}?populate=test1`)
+          .patch(`http://localhost:8080/api/test-2/update/${ids.join()}?populate=test1`)
           .send({ prop2a: 'val2aii' });
         expect((await Test2.find({ prop2a: 'val2aii' })).length).to.equal(3);
         records1.forEach(record => {
@@ -438,7 +410,6 @@ describe('1. UpdateRequestHandler', () => {
     });
 
     describe('1.6.2. When "filters" is given', () => {
-      // return;
       it('1.6.2.1. Should populate the given path', async () => {
         const test1 = await Test1.create({ prop1a: 'val1a' });
         for (let i = 0; i < 3; i++) {
@@ -446,7 +417,7 @@ describe('1. UpdateRequestHandler', () => {
         }
         const filters = JSON.stringify({ prop2a: 'val2ai' });
         const { body: { data: { records: records1 } } } = await superagent
-          .patch(`http://localhost:8080/site-1/api/test-2/update/?filters=${filters}&populate=test1`)
+          .patch(`http://localhost:8080/api/test-2/update/?filters=${filters}&populate=test1`)
           .send({ prop2a: 'val2aii' });
         expect((await Test2.find({ prop2a: 'val2aii' })).length).to.equal(3);
         records1.forEach(record => {
@@ -458,7 +429,6 @@ describe('1. UpdateRequestHandler', () => {
     });
 
     describe('1.6.3. When "_id" is given in an array of body objects', () => {
-      // return;
       it('1.6.3.1. Should populate the given path', async () => {
         const toUpdate = [];
         const test1 = await Test1.create({ prop1a: 'val1a' });
@@ -467,7 +437,7 @@ describe('1. UpdateRequestHandler', () => {
           toUpdate.push({ _id: record._id.toString(), prop2a: 'val2aii' });
         }
         const { body: { data: { records: records1 } } } = await superagent
-          .patch(`http://localhost:8080/site-1/api/test-2/update/?populate=test1`)
+          .patch(`http://localhost:8080/api/test-2/update/?populate=test1`)
           .send(toUpdate);
         expect((await Test2.find({ prop2a: 'val2aii' })).length).to.equal(3);
         records1.forEach(record => {

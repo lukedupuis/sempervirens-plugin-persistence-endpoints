@@ -51,13 +51,11 @@ const Test2 = db.getModel('Test2');
 describe('1. CreateRequestHandler', () => {
 
   describe('1.1. When "POST /api/{modelBasePath}/create" is called', () => {
-    // return;
 
     describe('1.1.1. When the POST body is a single record', () => {
-      // return;
       it('1.1.1.1. Should create and return a record', async () => {
         const { body: { data: { record } } } = await superagent
-          .post('http://localhost:8080/site-1/api/test-1/create')
+          .post('http://localhost:8080/api/test-1/create')
           .send({
             prop1a: 'val1a',
             prop1b: 'val1b'
@@ -68,10 +66,9 @@ describe('1. CreateRequestHandler', () => {
     });
 
     describe('1.1.2. When the POST body is multiple records', () => {
-      // return;
       it('1.1.2.1. Should create and record multiple records', async () => {
         const { body: { data: { records } } } = await superagent
-          .post('http://localhost:8080/site-1/api/test-1/create')
+          .post('http://localhost:8080/api/test-1/create')
           .send([
             { prop1a: 'val1ai', prop1b: 'val1bi' },
             { prop1a: 'val1aii', prop1b: 'val1bii' }
@@ -86,10 +83,9 @@ describe('1. CreateRequestHandler', () => {
     });
 
     describe('1.1.3. When the POST body contains more than the allowed max', () => {
-      // return;
       it('1.1.3.1. Should return an error', async () => {
         const { body: { error: { message } } } = await superagent
-          .post('http://localhost:8080/site-1/api/test-1/create')
+          .post('http://localhost:8080/api/test-1/create')
           .send([
             { prop1a: 'val1a', prop1b: 'val1b' },
             { prop1a: 'val1a', prop1b: 'val1b' },
@@ -103,10 +99,9 @@ describe('1. CreateRequestHandler', () => {
     });
 
     describe('1.1.4. When one or more records is created', () => {
-      // return;
       it('1.1.4.1. Should call the model pre-save hook', async () => {
         const { body: { data: { record } } } = await superagent
-          .post('http://localhost:8080/site-1/api/test-1/create')
+          .post('http://localhost:8080/api/test-1/create')
           .send({ prop1a: 'val1a', prop1b: 'val1b' });
         expect(record.prop1c).to.equal('val1a-val1b');
         const toCreate = [];
@@ -114,7 +109,7 @@ describe('1. CreateRequestHandler', () => {
           toCreate.push({ prop1a: 'val1a', prop1b: 'val1b' });
         }
         const { body: { data: { records } } } = await superagent
-          .post('http://localhost:8080/site-1/api/test-1/create')
+          .post('http://localhost:8080/api/test-1/create')
           .send(toCreate);
         records.forEach(record => {
           expect(record.prop1c).to.equal('val1a-val1b');
@@ -127,7 +122,7 @@ describe('1. CreateRequestHandler', () => {
       it('1.1.5.1. Should allow requests only if the token is valid', async () => {
         const token = authorizer.encrypt({ expiresIn: '1s', data: { prop1: 'val1' } });
         const { body: { data: { record } } } = await superagent
-          .post('http://localhost:8080/site-1/api/test-1a/create')
+          .post('http://localhost:8080/api/test-1a/create')
           .set('Authorization', `Bearer ${token}`)
           .send({ prop1a: 'val1a' });
         expect(record.prop1a).to.equal('val1a');
@@ -136,7 +131,7 @@ describe('1. CreateRequestHandler', () => {
 
         try {
           await superagent
-            .post('http://localhost:8080/site-1/api/test-1a/create')
+            .post('http://localhost:8080/api/test-1a/create')
             .set('Authorization', `Bearer ${token}`)
             .send({ prop1a: 'val1a' });
         } catch({ message }) {
@@ -150,17 +145,14 @@ describe('1. CreateRequestHandler', () => {
   });
 
   describe('1.2. When "POST /api/{modelBasePath}/create?populate=" is called', () => {
-    // return;
 
     describe('1.2.1. When the POST body is a single record', () => {
-      // return;
 
       describe('1.2.1.1. When "populate" is a string', () => {
-        // return;
         it('1.2.1. Should create and return a record with the property populated', async () => {
           const record1 = await Test1.create({ prop1a: 'val1a' });
           const { body: { data: { record: record2 } } } = await superagent
-            .post('http://localhost:8080/site-1/api/test-2/create?populate=test1')
+            .post('http://localhost:8080/api/test-2/create?populate=test1')
             .send({
               test1: record1._id.toString(),
               prop2a: 'val2a',
@@ -173,7 +165,6 @@ describe('1. CreateRequestHandler', () => {
       });
 
       describe('1.2.1.2. When "populate" is a JSON string with a multiple objects', () => {
-        // return;
         it('1.2.2. Should create and return a record with the property populated', async () => {
           const record1 = await Test1.create({ prop1a: 'val1a', prop1b: 'val1b' });
           const record2 = await Test2.create({ prop2a: 'val2a', prop2b: 'val2b' });
@@ -182,7 +173,7 @@ describe('1. CreateRequestHandler', () => {
             { path: 'test2', select: 'prop2a' }
           ]);
           const { body: { data: { record: record3 } } } = await superagent
-            .post(`http://localhost:8080/site-1/api/test-3/create?populate=${populate}`)
+            .post(`http://localhost:8080/api/test-3/create?populate=${populate}`)
             .send({
               test1: record1._id.toString(),
               test2: record2._id.toString(),
@@ -202,14 +193,12 @@ describe('1. CreateRequestHandler', () => {
     });
 
     describe('1.2.2. When the POST body is multiple records', () => {
-      // return;
 
       describe('1.2.2.1. When "populate" is a string', () => {
-        // return;
         it('1.2.2.1.1. Should create and return a record with the property populated', async () => {
           const record1 = await Test1.create({ prop1a: 'val1a' });
           const { body: { data: { records } } } = await superagent
-            .post('http://localhost:8080/site-1/api/test-2/create?populate=test1')
+            .post('http://localhost:8080/api/test-2/create?populate=test1')
             .send([
               {
                 test1: record1._id.toString(),
@@ -234,7 +223,6 @@ describe('1. CreateRequestHandler', () => {
       });
 
       describe('1.2.2.2. When "populate" is a JSON string with a multiple objects', () => {
-        // return;
         it('1.2.2.2.1. Should create and return a record with the property populated', async () => {
           const record1 = await Test1.create({ prop1a: 'val1a', prop1b: 'val1b' });
           const record2 = await Test2.create({ prop2a: 'val2a', prop2b: 'val2b' });
@@ -243,7 +231,7 @@ describe('1. CreateRequestHandler', () => {
             { path: 'test2', select: 'prop2a' }
           ]);
           const { body: { data: { records } } } = await superagent
-            .post(`http://localhost:8080/site-1/api/test-3/create?populate=${populate}`)
+            .post(`http://localhost:8080/api/test-3/create?populate=${populate}`)
             .send([
               {
                 test1: record1._id.toString(),
