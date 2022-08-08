@@ -1058,7 +1058,7 @@ describe('1. persistenceEndpoints', () => {
         it('1.6.2.4.1. Should allow requests only if the token is valid', async () => {
           const record1 = await Test1.create({ prop1a: 'val1ai' });
           const id1 = record1._id.toString();
-          const token = authorizer.encrypt({ expiresIn: '1s', data: { prop1: 'val1' } });
+          const token = authorizer.encrypt({ expiresIn: '1m', data: { prop1: 'val1' } });
           const { body: { data: { record } } } = await superagent
             .patch(`http://localhost:8080/api/test-1d/update/${id1}`)
             .set('Authorization', `Bearer ${token}`)
