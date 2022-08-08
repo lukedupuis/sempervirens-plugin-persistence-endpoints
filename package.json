@@ -34,8 +34,8 @@
   },
   "homepage": "https://github.com/lukedupuis/sempervirens-plugin-persistence-endpoints#readme",
   "dependencies": {
-    "@sempervirens/dao": "^0.2.2",
-    "@sempervirens/endpoint": "^0.9.0",
+    "@sempervirens/dao": "^0.3.0",
+    "@sempervirens/endpoint": "^0.9.1",
     "lodash.kebabcase": "^4.1.1"
   },
   "devDependencies": {
